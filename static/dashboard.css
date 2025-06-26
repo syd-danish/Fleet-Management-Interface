@@ -1,0 +1,206 @@
+ body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: white;
+      margin: 0;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      background-color: #003366;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th {
+      background-color: #e0f0ff;
+      color: #003366;
+      text-align: center;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid #cce0f5;
+    }
+
+    td {
+      background-color: #e0f0ff;
+      padding: 8px 12px;
+      border-bottom: 1px solid #e6f2ff;
+      font-size: 12px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 2000px;
+      margin: auto;
+    }
+
+    a.fleet-link {
+      color: #004085;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      overflow: auto;
+    }
+
+    .modal:target {
+      display: block;
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      color: #004085;
+      text-decoration: none;
+    }
+
+    .close-btn:hover {
+      color: #001f3f;
+    }
+
+    .tabs {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .tabs input[type="radio"] {
+      display: none;
+    }
+
+    .tab-labels {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #ccc;
+    }
+
+    .tab-labels label {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #f1f1f1;
+      cursor: pointer;
+      font-weight: bold;
+      border-right: 1px solid #ccc;
+    }
+
+    .tab-labels label:last-child {
+      border-right: none;
+    }
+
+    .tabs input[type="radio"]:checked + label {
+      background-color: #fff;
+      border-bottom: 2px solid white;
+    }
+    .tab-labels label:hover {
+  background-color: #dfefff;
+  color: #003366;
+  transition: 0.3s ease;
+}
+
+    .tab-content {
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: #fff;
+      max-height: 300px;
+      overflow-y: auto;
+      border-top: none;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+ .image-section {
+  margin-bottom: 30px;
+}
+
+.image-section h3 {
+  margin-bottom: 10px;
+  color: #003366;
+}
+
+.image-upload-container {
+  border: 2px dashed #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.image-upload {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.image-preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.image-preview-grid img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.vehicle-icon {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+.filter-icons {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background-color: #e0f0ff;
+  color: black;
+  border: 1px solid #001f3f ;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 4px;
+  transition: background-color 0.2s ease;
+}
+.filter-btn:hover {
+  background-color: #ddd;
+}
+.filter-btn.active {
+  background-color: #003366;
+  color: white;
+  font-weight: bold;
+  border: 1px solid #001f3f;
+}
+
+
+
+
+
+
+

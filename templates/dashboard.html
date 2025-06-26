@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <title>Dashboard - Fleet Manager</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  <style>
+   {% for fleet in fleets %}
+    #tab1-{{ fleet.fleet_id }}:checked ~ .tab-content .tab1-panel,
+    #tab2-{{ fleet.fleet_id }}:checked ~ .tab-content .tab2-panel,
+    #tab3-{{ fleet.fleet_id }}:checked ~ .tab-content .tab3-panel {
+      display: block;
+    }
+    {% endfor %}
+  </style>
+</head>
+<body>
+<div class="filter-icons active" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+  <button class="filter-btn" onclick="filterFleet(this,'All')">🔄 All</button>
+  <button class="filter-btn" onclick="filterFleet(this,'Van')">🚐 Van</button>
+  <button class="filter-btn" onclick="filterFleet(this,'GSM Pickup')">🛻 GSM Pickup</button>
+  <button class="filter-btn" onclick="filterFleet(this,'Bus')">🚌 Bus</button>
+  <button class="filter-btn" onclick="filterFleet(this,'MotorBike')">🏍️ MotorBike</button>
+  <button class="filter-btn" onclick="filterFleet(this,'Station Wagon')">🚙 Station Wagon</button>
+  <button class="filter-btn" onclick="filterFleet(this,'Pickup Truck')">🚚 Pickup Truck</button>
+</div>
+
+
+ <div class="container">
+  <table>
+    <thead>
+      <tr>
+        <th>S.No</th>
+        <th>Fleet ID</th>
+        <th>Icon</th>
+        <th>Registration No</th>
+        <th>Availability</th>
+        <th>Vehicle Name</th>
+        <th>Vehicle Type</th>
+        <th>Registration City</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fleet in fleets %}
+      <tr data-type="{{ fleet.vehicle_type }}">
+        <td>{{ loop.index }}</td>
+        <td><a class="fleet-link" href="#modal-{{ fleet.fleet_id }}">{{ fleet.fleet_id }}</a></td>
+        <td class="vehicle-icon">
+          {% if fleet.vehicle_type == 'Van' %}
+            🚐
+          {% elif fleet.vehicle_type == 'GSM Pickup' %}
+            🛻
+          {% elif fleet.vehicle_type == 'Bus' %}
+            🚌
+          {% elif fleet.vehicle_type == 'MotorBike' %}
+            🏍️
+          {% elif fleet.vehicle_type == 'Station Wagon' %}
+            🚙
+          {% elif fleet.vehicle_type == 'Pickup Truck' %}
+            🚚
+          {% else %}
+            🚗
+          {% endif %}
+        </td>
+        <td>{{ fleet.registration_no }}</td>
+        <td>{{ fleet.availability }}</td>
+        <td>{{ fleet.vehicle_name }}</td>
+        <td>{{ fleet.vehicle_type }}</td>
+        <td>{{ fleet.registration_city }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% for fleet in fleets %}
+  <div id="modal-{{ fleet.fleet_id }}" class="modal">
+    <div class="modal-content">
+      <a href="#" class="close-btn">&times;</a>
+      <h3>Fleet Details: {{ fleet.fleet_id }}</h3>
+
+      <div class="tabs">
+        <input type="radio" id="tab1-{{ fleet.fleet_id }}" name="tabs-{{ fleet.fleet_id }}" checked>
+        <label for="tab1-{{ fleet.fleet_id }}"></label>
+
+        <input type="radio" id="tab2-{{ fleet.fleet_id }}" name="tabs-{{ fleet.fleet_id }}">
+        <label for="tab2-{{ fleet.fleet_id }}"></label>
+
+        <input type="radio" id="tab3-{{ fleet.fleet_id }}" name="tabs-{{ fleet.fleet_id }}">
+        <label for="tab3-{{ fleet.fleet_id }}"></label>
+
+        <div class="tab-labels">
+          <label for="tab1-{{ fleet.fleet_id }}">Basic Info</label>
+          <label for="tab2-{{ fleet.fleet_id }}">More Info</label>
+          <label for="tab3-{{ fleet.fleet_id }}">Attachments</label>
+        </div>
+
+        <div class="tab-content">
+
+          <!-- Basic Info -->
+           <div class="tab-panel tab1-panel">
+            <div id="basic-info-display-{{ fleet.fleet_id }}">
+              <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 45%;">
+                  <p><strong>Registration ID:</strong> {{ fleet.registration_no }}</p>
+                  <p><strong>Availability:</strong> {{ fleet.availability }}</p>
+                  <p><strong>Vehicle Name:</strong> {{ fleet.vehicle_name }}</p>
+                  <p><strong>Vehicle Type:</strong> {{ fleet.vehicle_type }}</p>
+                  <p><strong>Registration City:</strong> {{ fleet.registration_city }}</p>
+                  <p><strong>Asset No:</strong> {{ fleet.asset_no }}</p>
+                </div>
+                <div style="flex: 1; min-width: 45%;">
+                  <p><strong>VIN No:</strong> {{ fleet.win_no }}</p>
+                  <p><strong>Plate No:</strong> {{ fleet.plate_no }}</p>
+                  <p><strong>Fuel Type:</strong> {{ fleet.fuel_type }}</p>
+                  <p><strong>Driving License Type:</strong> {{ fleet.driving_license_type }}</p>
+                  <p><strong>Engine No:</strong> {{ fleet.engine_no }}</p>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 10px;">
+                <button onclick="showEditForm('{{ fleet.fleet_id }}', 'basic')">Edit Info</button>
+              </div>
+            </div>
+
+            <form id="basic-info-form-{{ fleet.fleet_id }}" style="display: none;" method="POST" action="{{ url_for('edit_fleet', fleet_id=fleet.fleet_id) }}">
+              <input type="hidden" name="section" value="basic">
+              <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <div style="flex: 1; min-width: 45%;">
+                  <label>Registration No: <input type="text" name="registration_no" value="{{ fleet.registration_no }}" required></label><br>
+                  <label>Availability:
+                <select name="availability">
+                  <option value="Yes" {% if fleet.availability == 'Yes' %}selected{% endif %}>Yes</option>
+                  <option value="No" {% if fleet.availability == 'No' %}selected{% endif %}>No</option>
+                </select>
+              </label><br>
+                  <label>Vehicle Name: <input type="text" name="vehicle_name" value="{{ fleet.vehicle_name }}" required></label><br>
+                  <label>Vehicle Type:
+  <select name="vehicle_type">
+    {% for type in vehicle_types %}
+      <option value="{{ type }}" {% if fleet.vehicle_type == type %}selected{% endif %}>{{ type }}</option>
+    {% endfor %}
+  </select>
+</label>
+<br>
+                  <label>Registration City: <input type="text" name="registration_city" value="{{ fleet.registration_city }}" required></label><br>
+                  <label>Asset No: <input type="text" name="asset_no" value="{{ fleet.asset_no }}" required></label><br>
+                </div>
+                <div style="flex: 1; min-width: 45%;">
+                  <label>VIN No: <input type="text" name="win_no" value="{{ fleet.win_no }}" required></label><br>
+                  <label>Plate No: <input type="text" name="plate_no" value="{{ fleet.plate_no }}" required></label><br>
+                  <label>Fuel Type: <input type="text" name="fuel_type" value="{{ fleet.fuel_type }}" required></label><br>
+                  <label>Driving License Type: <input type="text" name="driving_license_type" value="{{ fleet.driving_license_type }}" required></label><br>
+                  <label>Engine No: <input type="text" name="engine_no" value="{{ fleet.engine_no }}" required></label><br>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 15px; ">
+    <button type="submit">Save Info</button>
+  </div>
+            </form>
+          </div>
+
+          <!-- More Info -->
+          <div class="tab-panel tab2-panel">
+            <div id="more-info-display-{{ fleet.fleet_id }}">
+              <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 45%;">
+                  <p><strong>Salik Account No:</strong> {{ fleet.salik_account_no }}</p>
+                  <p><strong>Salik Tag No:</strong> {{ fleet.salik_tag_no }}</p>
+                  <p><strong>Purchase Date:</strong> {{ fleet.purchase_date }}</p>
+                  <p><strong>Purchase Amount:</strong> {{ fleet.purchase_amount }}</p>
+                  <p><strong>Registration Expiry:</strong> {{ fleet.registration_expiry }}</p>
+                </div>
+                <div style="flex: 1; min-width: 45%;">
+                  <p><strong>Fuel Tank Capacity (L):</strong> {{ fleet.fuel_tank_capacity }}</p>
+                  <p><strong>No of Tyres:</strong> {{ fleet.no_of_tyres }}</p>
+                  <p><strong>Tyre Size:</strong> {{ fleet.tyre_size }}</p>
+                  <p><strong>Manufacturer:</strong> {{ fleet.manufacturer }}</p>
+                  <p><strong>Insurance Expiry:</strong> {{ fleet.insurance_expiry }}</p>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 10px;">
+                <button onclick="showEditForm('{{ fleet.fleet_id }}', 'more')">Edit Info</button>
+              </div>
+            </div>
+
+            <form id="more-info-form-{{ fleet.fleet_id }}" style="display: none;" method="POST" action="{{ url_for('edit_fleet', fleet_id=fleet.fleet_id) }}">
+              <input type="hidden" name="section" value="more">
+              <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <div style="flex: 1; min-width: 45%;">
+                  <label>Salik Account No: <input type="text" name="salik_account_no" value="{{ fleet.salik_account_no }}" required></label><br>
+                  <label>Salik Tag No: <input type="text" name="salik_tag_no" value="{{ fleet.salik_tag_no }}" required></label><br>
+                  <label>Purchase Date: <input type="date" name="purchase_date" value="{{ fleet.purchase_date }}" required></label><br>
+                  <label>Purchase Amount: <input type="number" name="purchase_amount" value="{{ fleet.purchase_amount }}" required></label><br>
+                  <label>Registration Expiry: <input type="date" name="registration_expiry" value="{{ fleet.registration_expiry }}" required></label><br>
+                </div>
+                <div style="flex: 1; min-width: 45%;">
+                  <label>Fuel Tank Capacity (L): <input type="number" name="fuel_tank_capacity" value="{{ fleet.fuel_tank_capacity }}" required></label><br>
+                  <label>No of Tyres: <input type="number" name="no_of_tyres" value="{{ fleet.no_of_tyres }}" required></label><br>
+                  <label>Tyre Size: <input type="text" name="tyre_size" value="{{ fleet.tyre_size }}" required></label><br>
+                  <label>Manufacturer: <input type="text" name="manufacturer" value="{{ fleet.manufacturer }}" required></label><br>
+                  <label>Insurance Expiry: <input type="date" name="insurance_expiry" value="{{ fleet.insurance_expiry }}" required></label><br>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 15px;">
+    <button type="submit">Save Info</button>
+  </div>
+            </form>
+          </div>
+          <!-- Attachments -->
+          <div class="tab-panel tab3-panel">
+  <div class="image-section">
+    <h3>Vehicle Images</h3>
+    <form action="{{ url_for('upload_vehicle_image', fleet_id=fleet.fleet_id) }}" method="POST" enctype="multipart/form-data" class="image-upload-container">
+      <input type="file" name="vehicle_image" accept="image/*" required class="image-upload" />
+      <button type="submit">Upload Image</button>
+    </form>
+    <div class="image-preview-grid" id="vehicle-preview">
+      {% for image_id in fleet.vehicle_images %}
+      <img src="{{ url_for('get_image', image_id=image_id) }}" alt="Vehicle Image" onerror="this.style.display='none';">
+      {% endfor %}
+    </div>
+    {% for image_id in fleet.vehicle_images %}
+<div style="display: inline-block; text-align: center;">
+  <img src="{{ url_for('get_image', image_id=image_id) }}" alt="Vehicle Image" style="max-width: 100px;">
+  <form action="{{ url_for('delete_image', fleet_id=fleet.fleet_id, image_id=image_id, image_type='vehicle') }}" method="POST" style="margin-top: 5px;">
+    <button type="submit">Delete</button>
+  </form>
+</div>
+{% endfor %}
+
+  </div>
+
+  <div class="image-section">
+    <h3>Registration ID Images</h3>
+    <form action="{{ url_for('upload_registration_image', fleet_id=fleet.fleet_id) }}" method="POST" enctype="multipart/form-data" class="image-upload-container">
+      <input type="file" name="registration_image" accept="image/*" required class="image-upload" />
+      <button type="submit">Upload Image</button>
+    </form>
+    <div class="image-preview-grid" id="registration-preview">
+      {% for image_id in fleet.registration_images %}
+      <img src="{{ url_for('get_image', image_id=image_id) }}" alt="Registration Image" onerror="this.style.display='none';" >
+      {% endfor %}
+    </div>
+    {% for image_id in fleet.vehicle_images %}
+<div style="display: inline-block; text-align: center;">
+  <img src="{{ url_for('get_image', image_id=image_id) }}" alt="Vehicle Image" style="max-width: 100px;">
+  <form action="{{ url_for('delete_image', fleet_id=fleet.fleet_id, image_id=image_id, image_type='registration') }}" method="POST" style="margin-top: 5px;">
+    <button type="submit">Delete</button>
+  </form>
+</div>
+{% endfor %}
+  </div>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+   {% with messages = get_flashed_messages(category_filter=["dashboard"]) %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+</div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
