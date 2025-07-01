@@ -1,4 +1,3 @@
-
 from flask import *
 from pymongo import MongoClient,errors
 from werkzeug.security import *
