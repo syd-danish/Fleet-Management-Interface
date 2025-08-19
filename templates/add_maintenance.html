@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Maintenance Entry</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+
+ <h1>Add Maintenance Entry</h1>
+
+  <form method="POST" action="{{ url_for('add_maintenance') }}">
+    <label>Fleet ID:
+      <select name="fleet_id" id="fleetIdSelect" required onchange="populateVehicleDetails()">
+        <option value="">Select</option>
+        {% for vehicle in vehicles %}
+          <option value="{{ vehicle.fleet_id }}"
+                  data-name="{{ vehicle.vehicle_name }}"
+                  data-type="{{ vehicle.vehicle_type }}"
+                  data-region="{{ vehicle.registration_city }}">
+            {{ vehicle.fleet_id }}
+          </option>
+        {% endfor %}
+      </select>
+    </label><br><br>
+
+    <label>Vehicle Name:
+      <input type="text" name="vehicle_name" id="vehicleName" readonly>
+    </label><br><br>
+
+    <label>Vehicle Type:
+      <input type="text" name="vehicle_type" id="vehicleType" readonly>
+    </label><br><br>
+
+    <label>Maintenance Type:
+      <select name="maintenance_type" required>
+        <option>Preventive</option>
+        <option>Corrective</option>
+        <option>Other</option>
+      </select>
+    </label><br><br>
+
+    <label>Remarks:
+      <textarea name="remarks" rows="3"></textarea>
+    </label><br><br>
+
+    <label>Start Date:
+      <input type="date" name="start_date" required>
+    </label><br><br>
+
+    <label>Expected End Date:
+      <input type="date" name="expected_end_date" required>
+    </label><br><br>
+
+    <label>Odometer:
+      <input type="number" name="odometer" required>
+    </label><br><br>
+
+    <label>Maintenance Status:
+      <select name="maintenance_status">
+        <option>Booked for Maintenance</option>
+        <option>Under Maintenance</option>
+        <option>Maintenance Completed</option>
+      </select>
+    </label><br><br>
+
+    <input type="submit" value="Add Maintenance">
+  </form>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

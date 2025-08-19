@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maintenance List - Fleet Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+<div id="sidebarToggle" onclick="toggleSidebar()">Menu</div>
+<div id="sidebar" class="sidebar">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <a href="{{ url_for('maintenance_list') }}">Maintenance List</a>
+  <a href="#" onclick="confirmLogout()">Logout</a>
+</div>
+
+<h1>Maintenance Records</h1>
+<a href="{{ url_for('add_maintenance') }}">
+  <button>➕ Add Maintenance</button>
+</a>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+        <div class="flash-message">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<table>
+    <thead>
+      <tr>
+        <th>S.No</th>
+        <th>Maintenance No</th>
+        <th>Vehicle ID</th>
+        <th>Maintenance Type</th>
+        <th>Job Card No</th>
+        <th>Start Date</th>
+        <th>Expected End Date</th>
+        <th>Vehicle Type</th>
+        <th>Status</th>
+        <th>Odometer</th>
+        <th>Region</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for mnt in maintenance %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>
+          <a href="#" class="maintenance-link" data-maintenance='{{ mnt | tojson | safe }}'>
+            {{ mnt.maintenance_no }}
+          </a>
+        </td>
+        <td>{{ mnt.fleet_id }}</td>
+        <td>{{ mnt.maintenance_type }}</td>
+        <td>{{ mnt.job_no }}</td>
+        <td>{{ mnt.start_date }}</td>
+        <td>{{ mnt.expected_end_date }}</td>
+        <td>{{ mnt.vehicle_type }}</td>
+        <td>{{ mnt.maintenance_status }}</td>
+        <td>{{ mnt.odometer }}</td>
+        <td>{{ mnt.region }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+
+<!-- Maintenance Details Modal -->
+<div id="viewModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Maintenance Details</h2>
+
+    <!-- View Mode -->
+    <div id="view-mode">
+      <div style="border: 2px solid #ccc; border-radius: 8px; padding: 20px; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 45%;">
+            <p><strong>Maintenance No:</strong> <span id="detail_maintenance_no"></span></p>
+            <p><strong>Fleet ID:</strong> <span id="detail_fleet_id"></span></p>
+            <p><strong>Vehicle Name:</strong> <span id="detail_vehicle_name"></span></p>
+            <p><strong>Vehicle Type:</strong> <span id="detail_vehicle_type"></span></p>
+            <p><strong>Maintenance Type:</strong> <span id="detail_maintenance_type"></span></p>
+            <p><strong>Remarks:</strong> <span id="detail_remarks"></span></p>
+          </div>
+          <div style="flex: 1; min-width: 45%;">
+            <p><strong>Start Date:</strong> <span id="detail_start_date"></span></p>
+            <p><strong>Expected End Date:</strong> <span id="detail_expected_end_date"></span></p>
+            <p><strong>Job Card No:</strong> <span id="detail_job_no"></span></p>
+            <p><strong>Status:</strong> <span id="detail_maintenance_status"></span></p>
+            <p><strong>Odometer:</strong> <span id="detail_odometer"></span></p>
+            <p><strong>Region:</strong> <span id="detail_region"></span></p>
+          </div>
+        </div>
+        <br>
+        <button onclick="showEditMode()">Edit Info</button>
+        <button onclick="deleteMaintenance()">Delete</button>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div id="edit-mode" style="display: none;">
+      <form id="editMaintenanceForm" method="POST">
+        <div style="border: 2px solid #ccc; border-radius: 8px; padding: 20px; margin-top: 20px;">
+          <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 45%; margin-right: 20px;">
+              <p><strong>Maintenance No:</strong> <span id="edit_maintenance_no"></span></p>
+              <p><strong>Fleet ID:</strong> <span id="edit_fleet_id"></span></p>
+              <p><strong>Vehicle Name:</strong> <span id="edit_vehicle_name"></span></p>
+              <p><strong>Vehicle Type:</strong> <span id="edit_vehicle_type"></span></p>
+
+              <label><strong>Maintenance Type:</strong><br>
+                <select name="maintenance_type" id="edit_maintenance_type" required style="width: 100%; padding: 5px;">
+                  <option value="Preventive">Preventive</option>
+                  <option value="Corrective">Corrective</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label><br><br>
+
+              <label><strong>Remarks:</strong><br>
+                <textarea name="remarks" id="edit_remarks" rows="3" style="width: 100%; padding: 5px;"></textarea>
+              </label>
+            </div>
+            <div style="flex: 1; min-width: 45%;">
+              <label><strong>Start Date:</strong><br>
+                <input type="date" name="start_date" id="edit_start_date" required style="width: 100%; padding: 5px;">
+              </label><br><br>
+
+              <label><strong>Expected End Date:</strong><br>
+                <input type="date" name="expected_end_date" id="edit_expected_end_date" required style="width: 100%; padding: 5px;">
+              </label><br><br>
+
+              <p><strong>Job Card No:</strong> <span id="edit_job_no"></span></p>
+
+              <label><strong>Status:</strong><br>
+                <select name="maintenance_status" id="edit_maintenance_status" required style="width: 100%; padding: 5px;">
+                  <option value="Booked for Maintenance">Booked for Maintenance</option>
+                  <option value="Under Maintenance">Under Maintenance</option>
+                  <option value="Maintenance Completed">Maintenance Completed</option>
+                </select>
+              </label><br><br>
+
+              <label><strong>Odometer:</strong><br>
+                <input type="number" name="odometer" id="edit_odometer" required style="width: 100%; padding: 5px;">
+              </label><br><br>
+
+              <p><strong>Region:</strong> <span id="edit_region"></span></p>
+            </div>
+          </div>
+          <br>
+          <button type="submit">Save Changes</button>
+          <button type="button" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</body>
+</html>
