@@ -40,6 +40,12 @@
       text-decoration: underline;
       cursor: pointer;
     }
+    a.maintenance-link{
+        color:#004085;
+        text-decoration: underline;
+      cursor: pointer;
+
+    }
 
     .modal {
       display: none;
@@ -51,9 +57,6 @@
       overflow: auto;
     }
 
-    .modal:target {
-      display: block;
-    }
 
     .modal-content {
       background: white;
@@ -118,6 +121,9 @@
   transition: 0.3s ease;
 }
 
+
+
+
     .tab-content {
       border: 1px solid #ccc;
       padding: 15px;
@@ -171,11 +177,17 @@
       align-items: center;
       justify-content: center;
     }
+
 .filter-icons {
+  margin-top: 70px;
   margin-bottom: 20px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content:center;
+    align-items: center;
+    padding-left: 60px;
+
 }
 
 .filter-btn {
@@ -196,6 +208,165 @@
   color: white;
   font-weight: bold;
   border: 1px solid #001f3f;
+}
+
+ .main-content {
+      margin-left: 200px;
+      padding: 20px;
+    }
+ /* Sidebar Toggle Button */
+#sidebarToggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 20px;
+  background-color: #4a5568; /* dark neutral */
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+#sidebarToggle:hover {
+  background-color: #2d3748;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  height: 100vh;
+  width: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #003366; /* matches your table heading */
+  overflow-x: hidden;
+  transition: width 0.3s ease;
+  padding-top: 70px;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Sidebar links */
+.sidebar a {
+  display: block;
+  padding: 14px 24px;
+  color: #f7fafc; /* very light */
+  font-size: 16px;
+  text-decoration: none;
+  transition: background 0.2s, padding-left 0.2s;
+}
+.sidebar a:hover {
+    color:black;
+  background-color: #cce0f5;
+  padding-left: 32px;
+}
+.flash-messages {
+    margin: 20px 0;
+}
+
+.flash-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    position: relative;
+    transition: opacity 0.3s ease;
+}
+
+.flash-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.flash-message.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ffeaa7;
+}
+
+/* Edit form styling within modal */
+#edit-mode label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#edit-mode input, #edit-mode select, #edit-mode textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#edit-mode input:focus, #edit-mode select:focus, #edit-mode textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+/* Button styling for edit mode */
+#edit-mode button {
+    background-color: #003366;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+#edit-mode button:hover {
+    background-color: #0056b3;
+}
+
+#edit-mode button[type="button"] {
+    background-color: #6c757d;
+}
+
+#edit-mode button[type="button"]:hover {
+    background-color: #545b62;
+}
+
+/* Delete button styling */
+button[onclick="deleteMaintenance()"] {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+button[onclick="deleteMaintenance()"]:hover {
+    background-color: #c82333;
+}
+
+/* Responsive design for modal content */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+
+    #edit-mode > form > div > div {
+        flex-direction: column;
+    }
+
+    #edit-mode > form > div > div > div {
+        margin-right: 0 !important;
+        margin-bottom: 20px;
+    }
 }
 
 
