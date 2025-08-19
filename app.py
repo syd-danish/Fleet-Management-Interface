@@ -2,7 +2,7 @@ from flask import *
 from pymongo import MongoClient,errors
 from werkzeug.security import *
 from werkzeug.utils import secure_filename
-import re,os,phonenumbers,json,gridfs
+import re,os,phonenumbers,json,gridfs,random
 from bson import ObjectId
 
 app = Flask(__name__)
@@ -11,6 +11,7 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client['fleet_db']
 users_collection = db['users']
 fleet_collection = db['fleets']
+maintenance_collection = db["maintenance"]
 fs = gridfs.GridFS(db)
 
 
@@ -261,6 +262,124 @@ def delete_image(fleet_id, image_id, image_type):
     )
     flash("Image deleted successfully.")
     return redirect(url_for('dashboard'))
+
+@app.route('/maintenance_list', methods=['GET'])
+def maintenance_list():
+    vehicles = list(fleet_collection.find())
+    maintenance = []
+    for mnt in maintenance_collection.find():
+        mnt['_id'] = str(mnt['_id'])  # convert ObjectId to string
+        maintenance.append(mnt)
+    return render_template("maintenance_list.html", vehicles=vehicles, maintenance=maintenance)
+
+
+
+
+
+@app.route('/edit_maintenance/<maintenance_id>', methods=['POST'])
+def edit_maintenance(maintenance_id):
+    try:
+        # Get the updated data from the form
+        updated_data = {
+            "maintenance_type": request.form.get("maintenance_type"),
+            "remarks": request.form.get("remarks"),
+            "start_date": request.form.get("start_date"),
+            "expected_end_date": request.form.get("expected_end_date"),
+            "maintenance_status": request.form.get("maintenance_status"),
+            "odometer": request.form.get("odometer")
+        }
+
+        # Remove empty values
+        updated_data = {k: v for k, v in updated_data.items() if v is not None and v.strip() != ""}
+
+        # Update the maintenance record
+        result = maintenance_collection.update_one(
+            {"_id": ObjectId(maintenance_id)},
+            {"$set": updated_data}
+        )
+
+        if result.modified_count > 0:
+            flash("Maintenance record updated successfully.")
+        else:
+            flash("No changes were made.")
+
+    except Exception as e:
+        flash(f"Error updating maintenance record: {str(e)}")
+
+    return redirect(url_for('maintenance_list'))
+
+
+@app.route('/delete_maintenance/<maintenance_id>', methods=['POST'])
+def delete_maintenance(maintenance_id):
+    try:
+        result = maintenance_collection.delete_one({"_id": ObjectId(maintenance_id)})
+
+        if result.deleted_count > 0:
+            flash("Maintenance record deleted successfully.")
+        else:
+            flash("Maintenance record not found.")
+
+    except Exception as e:
+        flash(f"Error deleting maintenance record: {str(e)}")
+
+    return redirect(url_for('maintenance_list'))
+
+
+@app.route('/add_maintenance', methods=['GET', 'POST'])
+def add_maintenance():
+    if request.method == 'POST':
+        fleet_id = request.form.get('fleet_id')
+        vehicle = fleet_collection.find_one({'fleet_id': fleet_id})
+
+        if not vehicle:
+            flash("Invalid Fleet ID: No matching vehicle found.")
+            return redirect(url_for('add_maintenance'))
+
+        # Check if this vehicle already has an active maintenance record
+        existing_maintenance = maintenance_collection.find_one({
+            'fleet_id': fleet_id,
+            'maintenance_status': {'$in': ['Booked for Maintenance', 'Under Maintenance']}
+        })
+
+        if existing_maintenance:
+            flash(
+                "This vehicle already has an active maintenance record. Please complete or cancel the existing maintenance before adding a new one.")
+            return redirect(url_for('add_maintenance'))
+
+        maintenance_collection.create_index("job_no", unique=True)
+        maintenance_collection.create_index("maintenance_no", unique=True)
+
+        generate_maintenance_no = "MNT" + ''.join([str(random.randint(0, 9)) for _ in range(10)])
+        generate_job_no = ''.join([str(random.randint(0, 9)) for _ in range(7)])
+
+        maintenance_data = {
+            "fleet_id": fleet_id,
+            "vehicle_name": vehicle['vehicle_name'],
+            "vehicle_type": vehicle['vehicle_type'],
+            "registration_city": vehicle['registration_city'],
+            "maintenance_type": request.form['maintenance_type'],
+            "remarks": request.form['remarks'],
+            "start_date": request.form['start_date'],
+            "expected_end_date": request.form['expected_end_date'],
+            "job_no": request.form.get('job_no') or generate_job_no,
+            "maintenance_status": request.form['maintenance_status'],
+            "odometer": request.form['odometer'],
+            "region": vehicle['registration_city'],
+            "maintenance_no": generate_maintenance_no
+        }
+
+        try:
+            maintenance_collection.insert_one(maintenance_data)
+            flash("Maintenance record added successfully.")
+        except errors.DuplicateKeyError as e:
+            flash("Error: Duplicate job number or maintenance number. Please try again.")
+            return redirect(url_for('add_maintenance'))
+
+        return redirect(url_for('maintenance_list'))
+
+    # GET handler - show the form
+    vehicles = list(fleet_collection.find())
+    return render_template("add_maintenance.html", vehicles=vehicles)
 
 
 if __name__ == '__main__':
