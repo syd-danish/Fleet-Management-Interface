@@ -14,9 +14,7 @@
 </div>
 
 <h1>Maintenance Records</h1>
-<a href="{{ url_for('add_maintenance') }}">
-  <button>➕ Add Maintenance</button>
-</a>
+<button onclick="showAddMaintenanceModal()">➕ Add Maintenance</button>
 
 <!-- Flash messages -->
 {% with messages = get_flashed_messages() %}
@@ -156,6 +154,79 @@
         </div>
       </form>
     </div>
+  </div>
+</div>
+
+<!-- Add Maintenance Modal -->
+<div id="addMaintenanceModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAddMaintenanceModal()">&times;</span>
+    <h2>Add Maintenance Entry</h2>
+
+    <form method="POST" action="{{ url_for('add_maintenance') }}">
+      <div style="border: 2px solid #ccc; border-radius: 8px; padding: 20px; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 45%; margin-right: 20px;">
+            <label><strong>Fleet ID:</strong><br>
+              <select name="fleet_id" id="addFleetIdSelect" required onchange="populateAddVehicleDetails()" style="width: 100%; padding: 5px;">
+                <option value="">Select Fleet ID</option>
+                {% for vehicle in vehicles %}
+                  <option value="{{ vehicle.fleet_id }}"
+                          data-name="{{ vehicle.vehicle_name }}"
+                          data-type="{{ vehicle.vehicle_type }}"
+                          data-region="{{ vehicle.registration_city }}">
+                    {{ vehicle.fleet_id }}
+                  </option>
+                {% endfor %}
+              </select>
+            </label><br><br>
+
+            <p><strong>Vehicle Name:</strong> <span id="addVehicleName"></span></p>
+            <p><strong>Vehicle Type:</strong> <span id="addVehicleType"></span></p>
+            <p><strong>Region:</strong> <span id="addRegion"></span></p>
+
+            <label><strong>Maintenance Type:</strong><br>
+              <select name="maintenance_type" required style="width: 100%; padding: 5px;">
+                <option value="">Select Type</option>
+                <option value="Preventive">Preventive</option>
+                <option value="Corrective">Corrective</option>
+                <option value="Other">Other</option>
+              </select>
+            </label><br><br>
+
+            <label><strong>Remarks:</strong><br>
+              <textarea name="remarks" rows="3" style="width: 100%; padding: 5px;"></textarea>
+            </label>
+          </div>
+          <div style="flex: 1; min-width: 45%;">
+            <label><strong>Start Date:</strong><br>
+              <input type="date" name="start_date" required style="width: 100%; padding: 5px;">
+            </label><br><br>
+
+            <label><strong>Expected End Date:</strong><br>
+              <input type="date" name="expected_end_date" required style="width: 100%; padding: 5px;">
+            </label><br><br>
+
+            <label><strong>Odometer:</strong><br>
+              <input type="number" name="odometer" required style="width: 100%; padding: 5px;">
+            </label><br><br>
+
+            <label><strong>Maintenance Status:</strong><br>
+              <select name="maintenance_status" style="width: 100%; padding: 5px;">
+                <option value="Booked for Maintenance">Booked for Maintenance</option>
+                <option value="Under Maintenance">Under Maintenance</option>
+                <option value="Maintenance Completed">Maintenance Completed</option>
+              </select>
+            </label><br><br>
+          </div>
+        </div>
+        <br>
+        <div style="text-align: right;">
+          <button type="submit">Add Maintenance</button>
+          <button type="button" onclick="closeAddMaintenanceModal()">Cancel</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 
