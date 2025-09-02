@@ -220,10 +220,11 @@ function closeMaintenanceModal() {
     if (editMode) editMode.style.display = 'none';
 }
 
+// ADD MAINTENANCE MODAL FUNCTIONS
 function showAddMaintenanceModal() {
-    const modal = document.getElementById("maintenanceModal");
+    const modal = document.getElementById("addMaintenanceModal");
     if (!modal) {
-        console.error("Modal element with ID 'maintenanceModal' not found.");
+        console.error("Modal element with ID 'addMaintenanceModal' not found.");
         return;
     }
 
@@ -231,17 +232,51 @@ function showAddMaintenanceModal() {
     const form = modal.querySelector("form");
     if (form) form.reset();
 
-    // Clear read-only fields manually
-    const vehicleName = document.getElementById("vehicleName");
-    const vehicleType = document.getElementById("vehicleType");
-    if (vehicleName) vehicleName.value = "";
-    if (vehicleType) vehicleType.value = "";
+    // Clear auto-filled fields
+    clearAddVehicleDetails();
 
     // Display the modal
     modal.style.display = "block";
     document.body.style.overflow = 'hidden';
 }
 
+function closeAddMaintenanceModal() {
+    const modal = document.getElementById("addMaintenanceModal");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function populateAddVehicleDetails() {
+    const select = document.getElementById('addFleetIdSelect');
+    if (!select) return;
+
+    const selected = select.options[select.selectedIndex];
+    const name = selected.getAttribute('data-name') || '';
+    const type = selected.getAttribute('data-type') || '';
+    const region = selected.getAttribute('data-region') || '';
+
+    const vehicleName = document.getElementById('addVehicleName');
+    const vehicleType = document.getElementById('addVehicleType');
+    const regionElement = document.getElementById('addRegion');
+
+    if (vehicleName) vehicleName.innerText = name;
+    if (vehicleType) vehicleType.innerText = type;
+    if (regionElement) regionElement.innerText = region;
+}
+
+function clearAddVehicleDetails() {
+    const vehicleName = document.getElementById('addVehicleName');
+    const vehicleType = document.getElementById('addVehicleType');
+    const regionElement = document.getElementById('addRegion');
+
+    if (vehicleName) vehicleName.innerText = '';
+    if (vehicleType) vehicleType.innerText = '';
+    if (regionElement) regionElement.innerText = '';
+}
+
+// LEGACY FUNCTION (keeping for compatibility)
 function populateVehicleDetails() {
     const select = document.getElementById('fleetIdSelect');
     if (!select) return;
@@ -317,6 +352,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (viewMode) viewMode.style.display = 'block';
                 if (editMode) editMode.style.display = 'none';
             }
+
+            // Clear add maintenance form if closing add modal
+            if (e.target.id === 'addMaintenanceModal') {
+                const form = e.target.querySelector("form");
+                if (form) form.reset();
+                clearAddVehicleDetails();
+            }
         }
     });
 
@@ -353,6 +395,13 @@ document.addEventListener('keydown', function(e) {
                     const editMode = document.getElementById("edit-mode");
                     if (viewMode) viewMode.style.display = 'block';
                     if (editMode) editMode.style.display = 'none';
+                }
+
+                // Clear add maintenance form
+                if (modal.id === 'addMaintenanceModal') {
+                    const form = modal.querySelector("form");
+                    if (form) form.reset();
+                    clearAddVehicleDetails();
                 }
             }
         });
