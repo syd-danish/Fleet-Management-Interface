@@ -325,7 +325,7 @@ def delete_maintenance(maintenance_id):
     return redirect(url_for('maintenance_list'))
 
 
-@app.route('/add_maintenance', methods=['GET', 'POST'])
+@app.route('/add_maintenance', methods=['POST'])
 def add_maintenance():
     if request.method == 'POST':
         fleet_id = request.form.get('fleet_id')
@@ -379,7 +379,7 @@ def add_maintenance():
 
     # GET handler - show the form
     vehicles = list(fleet_collection.find())
-    return render_template("add_maintenance.html", vehicles=vehicles)
+    return render_template("maintenance_list.html", vehicles=vehicles)
 
 
 if __name__ == '__main__':
